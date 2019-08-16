@@ -504,6 +504,7 @@ for epoch in range(EPOCH):
 
     time.sleep(0.1)
     loss_history = 0
+	net.train()
     for step, batch in enumerate(tqdm(trains_loader, desc="Iteration")):
         batch = tuple(t.cuda() for t in batch)
         batch_x1, batch_x2, batch_y = batch
@@ -519,7 +520,8 @@ for epoch in range(EPOCH):
     time.sleep(0.1)
     print('EPOCH: {}, Loss: {} \n'.format(epoch, loss_history/BATCH_NUMSs))
 
-    #accuracy
+    net.eval()
+	#accuracy
     count = 0
     for step, batch in enumerate(tqdm(valid_loader, desc="Iteration")):
         batch = tuple(t.cuda() for t in batch)
@@ -545,3 +547,35 @@ for epoch in range(EPOCH):
         print("save model")
         #torch.save(state_dict, 'siamese_net.pt')
 		torch.save(net, 'siamese_net.pt')
+
+
+	'''
+    #mytest
+    
+    num = 0
+    net.eval()
+    for step, batch in enumerate(tqdm(valid_loader, desc="Iteration")):
+        if is_cuda:
+            batch = tuple(t.cuda() for t in batch)
+        batch_x1, batch_x2, batch_y = batch
+        print(batch_x1)
+        logits = net([batch_x1, batch_x2])
+        logits = F.softmax(logits, dim=1)
+        logits = logits.detach().cpu().numpy().tolist()
+        print("11111:", logits)
+        logits = net([batch_x1, batch_x2])
+        logits = F.softmax(logits, dim=1)
+        logits = logits.detach().cpu().numpy()
+        outputs = np.argmax(logits, axis=0).tolist()[1]
+        print("22222:", outputs)
+
+        # label_ids = batch_y.cpu().numpy()
+        # tmp_eval_accuracy =  accuracy(logits, label_ids)
+        # count = count + tmp_eval_accuracy
+        num += 1
+
+        if num == 1:
+            break
+    
+    '''
+
